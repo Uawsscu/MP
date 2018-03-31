@@ -1,0 +1,26 @@
+#JSGF V1.0;
+
+/**
+ * JSGF Grammar for Turtle example
+ */
+
+grammar sentence;
+
+public <move> =  <obj> | turn off | merry one | <train> | <b> | move to left | [jerry] <command> | <question> | <control> |call [back] step| [stop] call [back]|<what>;
+
+<control> = [this is] how [to] <verb> a <obj> | [this][is][ how][ to] <verb> a <color><obj> ;
+
+<train> =  this is [a] <obj> [end] | this is [a] <color><obj> [end];
+<command> =  <verb> a <obj>|<verb> a <color><obj> | <etc> ;
+<question> = [do] [you] [know] a <obj> | [do] [you] [know] a <color><obj> ;
+<what> = [hey][jerry] [what] [is that];
+
+
+<color> = [green] ;
+<obj> =  ball | glass  | remote | cup | teddy | bottle | green bottle;
+<verb> = grab | touch | pick ;
+<number> = one | two | three | five | four ;
+<etc> = move the <obj> to the left | right ;
+
+<a> =  it <b> | is that so <b> | we have met again ;
+<b> = dog | cat | fish | rat | rabbit | total | log | sock | look | bally ;
