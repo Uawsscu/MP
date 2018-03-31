@@ -502,30 +502,35 @@ while True:
                             print "STOP.."
 
                         # >>>>>>> JERRY <<<<<<<<<<<<
-                        elif strDecode == 'stop action':
-                            jerry == False
 
                         elif strDecode[:5] == 'jerry':
                             print "\n------------------------------------------"
                             print '\nStream decoding result:', strDecode
                             v = get_V(strDecode)#
+
+
+                            with sqlite3.connect("Test_PJ2.db") as con:
+                                cur = con.cursor()
+                                cur.execute('select M1,M2,M3,M4,M5,M6,M7,M8 from Action_Robot where ID = 1')
+                                row1 = cur.fetchall()
+                                for element1 in row1:
+                                    joint = str(element1)
+                                    command = joint[1:]
+                                    print(command)
+                                    talker1(command)
+                                    time.sleep(3)
+
                             with sqlite3.connect("Test_PJ2.db") as con:
                                 cur = con.cursor()
                                 cur.execute(
                                     'Select Action_Robot.M1,Action_Robot.M2,Action_Robot.M3,Action_Robot.M4,Action_Robot.M5,Action_Robot.M6,Action_Robot.M7,Action_Robot.M8 from Action_Robot inner join ActionName on Action_Robot.ID = ActionName.ID where Name = ?',
                                     (v,))
                                 row = cur.fetchall()
-
-
-
                                 for element in row:
                                     joint2 = str(element)
                                     # command1 = command1 + joint2
                                     command2 = joint2[1:]
                                     print(command2)
-                                    if jerry == False:
-                                        jerry = True
-                                        break
 
                                     talker1(command2)
                                     # joint = ""
