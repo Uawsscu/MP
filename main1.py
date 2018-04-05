@@ -407,7 +407,35 @@ def talker1(msg1):
     rospy.init_node('Talker', anonymous=True)
 
     pub2.publish(String(msg1))
+################################################## Keep #####################################################
 
+def keep_First_Home() :
+    check_Go = False
+    JOB = False
+    JOB_HowTo_Open = True
+    # insert table
+    try:
+        with sqlite3.connect("Test_PJ2.db") as con:
+            cur = con.cursor()
+            lenObj = int(lenDB("Test_PJ2.db", "SELECT * FROM ActionName"))  # count ROWs
+            cur.execute('insert into ActionName (ID,Name) values (?,?)',
+                        (lenObj + 1, STPname))
+            print(STPname)
+    except:
+        print "Action in table!!!"
+    print("SAVE NAME TO Table Main_action")
+
+    # home
+    with sqlite3.connect("Test_PJ2.db") as con:
+        cur = con.cursor()
+        cur.execute('select M1,M2,M3,M4,M5,M6,M7,M8 from Action_Robot where ID = 1')
+        row1 = cur.fetchall()
+        for element1 in row1:
+            joint = str(element1)
+            command = joint[1:]
+            print(command)
+            talker1(command)
+            time.sleep(2)
 
 ################################################### MAIN ##################################################
 
@@ -415,7 +443,8 @@ JOB = True
 JOB_HowTo_Open = False
 STPindex = 0
 jerry = True
-
+check_Go = False
+JOB_SAVE = False
 while True:
 
     buf = stream.read(1024)
@@ -435,129 +464,175 @@ while True:
                     if strDecode != '':
                         #print strDecode
                         # >>>>>>> END <<<<<<<<<<<<
-                        if JOB == True and strDecode[-3:] == 'end' and strDecode[:9] == "this is a" :
-                            JOB = False
-                            print "\n------------------------------------------"
-                            print '\nStream decoding result:', strDecode
+                        try:
+                            if JOB == True and strDecode[-3:] == 'end' and strDecode[:9] == "this is a":
+                                JOB = False
+                                print "\n------------------------------------------"
+                                print '\nStream decoding result:', strDecode
 
-                            obj_name = get_object_train(strDecode)  # sentence to word
-                            print "Speech : ", obj_name
-                            # create folder
-                            dataset_Path = r'/home/mprang/PycharmProjects/object_detection/object_recognition_detection/pic/' + obj_name
-                            p="/home/mprang/PycharmProjects/object_detection/object_recognition_detection/pic/"+ obj_name+"/"
+                                obj_name = get_object_train(strDecode)  # sentence to word
+                                print "Speech : ", obj_name
+                                # create folder
+                                dataset_Path = r'/home/mprang/PycharmProjects/object_detection/object_recognition_detection/pic/' + obj_name
+                                p = "/home/mprang/PycharmProjects/object_detection/object_recognition_detection/pic/" + obj_name + "/"
 
-                            if not os.path.exists(dataset_Path):
-                                print dataset_Path
-                                os.makedirs(dataset_Path)
-                                capture(p,obj_name)  #capture image for train >> SAVE IMAGE
-                                lenObj = int(lenDB("Corpus_Main.db", "SELECT * FROM obj_ALL"))  # count ROWs
-                                insert_object_Train(obj_name, int(lenObj + 1))  # check Found objects?
-                            JOB = True
-                            save_model()
+                                if not os.path.exists(dataset_Path):
+                                    print dataset_Path
+                                    os.makedirs(dataset_Path)
+                                    capture(p, obj_name)  # capture image for train >> SAVE IMAGE
+                                    lenObj = int(lenDB("Corpus_Main.db", "SELECT * FROM obj_ALL"))  # count ROWs
+                                    insert_object_Train(obj_name, int(lenObj + 1))  # check Found objects?
+                                JOB = True
+                                save_model()
 
 
-                        # >>>>>>> ARM <<<<<<<<<<<<
-                        elif JOB ==True and strDecode[:14] == 'this is how to':
-                            JOB = False
-                            JOB_HowTo_Open = True
-                            print "\n------------------------------------------"
-                            print '\nStream decoding result:', strDecode
+                            # >>>>>>> ARM <<<<<<<<<<<<
+                            elif check_Go == False and JOB == True and strDecode[:14] == 'this is how to':
+                                print "\n------------------------------------------"
+                                print '\nStream decoding result:', strDecode
 
-                            STPname = get_V(strDecode)  # grab
-                            #insert table
-                            try :
+                                STPname = get_V(strDecode)  # grab
+
+                                # check name
+                                check = 0
+                                with sqlite3.connect("Test_PJ2.db") as con:
+                                    cur1 = con.cursor()
+                                    cur1.execute(
+                                        'Select ID from ActionName where Name = ?', (STPname,))
+                                    row1 = cur1.fetchall()
+                                    for i in row1:
+                                        check = check + 1
+                                if (check != 0):
+                                    check_Go = True
+                                    print " YOU JA Tum Tor mi ???" + "look : " + STPname
+
+                                else:
+                                    keep_First_Home()
+
+                            elif check_Go == True and strDecode == "yes let go":
+
+                                print " OK , please speak... call back step"
+                                JOB_HowTo_Open = True
+                                check_Go = False
+
+                            elif check_Go == True and strDecode == "no":
+                                print "OK stop"
+                                check_Go = False
+                                JOB = True
+                                JOB_HowTo_Open = False
+
+
+
+                            elif JOB_HowTo_Open == True and strDecode == 'call back step':
+                                print 'Stream decoding result:', strDecode
+                                STPindex += 1
+                                print STPindex, " : ", STPname
+                                talker(9)
+                                # SAVE Action
+                            elif JOB_HowTo_Open == True and strDecode == 'stop call back':
+                                JOB = True
+                                JOB_HowTo_Open = False
+                                STPindex = 0
+                                JOB_SAVE = True
+
+                                print "STOP.. You ja save mi"
+
+                            elif JOB_SAVE == True and strDecode == 'yes':
+                                with sqlite3.connect("Test_PJ2.db") as con:
+                                    cur2 = con.cursor()
+                                    cur2.execute('select ID from ActionName where Name = ?', (STPname,))
+                                    row = cur2.fetchone()
+                                    for element11 in row:
+                                        id1 = int(element11)
+
+                                        cur3 = con.cursor()
+                                        cur3.execute('delete from Action_Robot where ID = ?', (id1,))
+
+                                list1 = []
+                                for i in select_Buffer():
+                                    list1.append(selectID_AcName(STPname))
+                                    for x in i:
+                                        list1.append(x)
+                                    with sqlite3.connect("Test_PJ2.db") as con:
+                                        cur4 = con.cursor()
+                                        cur4.execute(
+                                            'insert into Action_Robot (ID,StepAction,M1,M2,M3,M4,M5,M6,M7,M8) values (?,?,?,?,?,?,?,?,?,?)',
+                                            (list1))
+                                        print(list1)
+                                        del list1[:]
+
+                                del_buff()
+
+                                talker(9)
+                                JOB_SAVE = False
+
+                            elif JOB_SAVE == True and strDecode == 'no':
+                                print "del buff"
+                                del_buff()
+                                JOB_SAVE = False
+
+
+
+
+                            # >>>>>>> JERRY <<<<<<<<<<<<
+
+                            elif strDecode[:5] == 'jerry':
+                                print "\n------------------------------------------"
+                                print '\nStream decoding result:', strDecode
+                                v = get_V(strDecode)  #
+
                                 with sqlite3.connect("Test_PJ2.db") as con:
                                     cur = con.cursor()
-                                    lenObj = int(lenDB("Test_PJ2.db", "SELECT * FROM ActionName"))  # count ROWs
-                                    cur.execute('insert into ActionName (ID,Name) values (?,?)', (lenObj + 1, STPname))
-                                    print(STPname)
-                            except :
-                                print "Action in table!!!"
-                            print("SAVE NAME TO Table Main_action")
+                                    cur.execute('select M1,M2,M3,M4,M5,M6,M7,M8 from Action_Robot where ID = 1')
+                                    row1 = cur.fetchall()
+                                    for element1 in row1:
+                                        joint = str(element1)
+                                        command = joint[1:]
+                                        print(command)
+                                        talker1(command)
+                                        time.sleep(3)
 
-
-                        elif JOB_HowTo_Open == True and strDecode == 'call back step':
-                            print 'Stream decoding result:', strDecode
-                            STPindex +=1
-                            print STPindex, " : ", STPname
-                            talker(9)
-                            #SAVE Action
-                        elif JOB_HowTo_Open == True and strDecode == 'stop call back':
-                            JOB = True
-                            JOB_HowTo_Open = False
-                            STPindex = 0
-                            list = []
-                            for i in select_Buffer():
-                                list.append(selectID_AcName(STPname))
-                                for x in i:
-                                    list.append(x)
                                 with sqlite3.connect("Test_PJ2.db") as con:
                                     cur = con.cursor()
                                     cur.execute(
-                                        'insert into Action_Robot (ID,StepAction,M1,M2,M3,M4,M5,M6,M7,M8) values (?,?,?,?,?,?,?,?,?,?)',
-                                        (list))
-                                    print(list)
-                                    del list[:]
-                            del_buff()
-                            print "STOP.."
+                                        'Select Action_Robot.M1,Action_Robot.M2,Action_Robot.M3,Action_Robot.M4,Action_Robot.M5,Action_Robot.M6,Action_Robot.M7,Action_Robot.M8 from Action_Robot inner join ActionName on Action_Robot.ID = ActionName.ID where Name = ?',
+                                        (v,))
+                                    row = cur.fetchall()
+                                    for element in row:
+                                        joint2 = str(element)
+                                        # command1 = command1 + joint2
+                                        command2 = joint2[1:]
+                                        print(command2)
 
-                        # >>>>>>> JERRY <<<<<<<<<<<<
+                                        talker1(command2)
+                                        # joint = ""
+                                        command1 = ""
 
-                        elif strDecode[:5] == 'jerry':
-                            print "\n------------------------------------------"
-                            print '\nStream decoding result:', strDecode
-                            v = get_V(strDecode)#
-
-
-                            with sqlite3.connect("Test_PJ2.db") as con:
-                                cur = con.cursor()
-                                cur.execute('select M1,M2,M3,M4,M5,M6,M7,M8 from Action_Robot where ID = 1')
-                                row1 = cur.fetchall()
-                                for element1 in row1:
-                                    joint = str(element1)
-                                    command = joint[1:]
-                                    print(command)
-                                    talker1(command)
-                                    time.sleep(3)
-
-                            with sqlite3.connect("Test_PJ2.db") as con:
-                                cur = con.cursor()
-                                cur.execute(
-                                    'Select Action_Robot.M1,Action_Robot.M2,Action_Robot.M3,Action_Robot.M4,Action_Robot.M5,Action_Robot.M6,Action_Robot.M7,Action_Robot.M8 from Action_Robot inner join ActionName on Action_Robot.ID = ActionName.ID where Name = ?',
-                                    (v,))
-                                row = cur.fetchall()
-                                for element in row:
-                                    joint2 = str(element)
-                                    # command1 = command1 + joint2
-                                    command2 = joint2[1:]
-                                    print(command2)
-
-                                    talker1(command2)
-                                    # joint = ""
-                                    command1 = ""
-
-                                    time.sleep(3)
-                            #corpus_Arm
+                                        time.sleep(3)
+                                        # corpus_Arm
 
 
-                        # >>>>>>> PASS DO YOU KNOW~??? <<<<<<<<<<<<
-                        elif JOB == True and strDecode[:11] == 'do you know':
-                            JOB = False
-                            print "\n------------------------------------------"
-                            print '\nStream decoding result:', strDecode
-                            obj_name = get_object_question(strDecode)
-                            print(obj_name)
-                            obj_find = search_object_Train(obj_name)
+                            # >>>>>>> PASS DO YOU KNOW~??? <<<<<<<<<<<<
+                            elif JOB == True and strDecode[:11] == 'do you know':
+                                JOB = False
+                                print "\n------------------------------------------"
+                                print '\nStream decoding result:', strDecode
+                                obj_name = get_object_question(strDecode)
+                                print(obj_name)
+                                obj_find = search_object_Train(obj_name)
 
-                            if obj_find != "None":
-                                print "Yes , I know!"
-                            else: print "No , I don't know!"
-                            JOB = True
-                        elif JOB == True and strDecode[:22]== 'hey jerry what is that':
-                            print "\n------------------------------------------"
-                            print '\nStream decoding result:', strDecode
-                            obj_detect = detectBOW()
-                            print "That is a ",obj_detect
+                                if obj_find != "None":
+                                    print "Yes , I know!"
+                                else:
+                                    print "No , I don't know!"
+                                JOB = True
+                            elif JOB == True and strDecode[:22] == 'hey jerry what is that':
+                                print "\n------------------------------------------"
+                                print '\nStream decoding result:', strDecode
+                                obj_detect = detectBOW()
+                                print "That is a ", obj_detect
+                        except :
+                            print "..."
 
 
                 except AttributeError:

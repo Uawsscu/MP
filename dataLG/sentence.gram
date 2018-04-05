@@ -8,7 +8,7 @@ grammar sentence;
 
 public <move> =   merry one | <b> | <control> | move to left | [jerry] <command> | <question>  |call [back] step| [stop] call [back]|<what>;
 
-<control> = [this is] how to <verb> a <obj> | [this is][how to] <verb> a <color><obj> ;
+<control> = [this is] how to <verb> a <obj> | [this is][how to] <verb> a <color><obj> | yes let go |no |yes;
 
 <train> =  this is [a] <obj> [end] | this is [a] <color><obj> [end];
 <command> =  <verb> a <obj>|<verb> a <color><obj> | <etc> ;
