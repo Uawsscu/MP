@@ -462,7 +462,7 @@ while True:
                     #print strDecode
 
                     if strDecode != '':
-                        #print strDecode
+                        print strDecode
                         # >>>>>>> END <<<<<<<<<<<<
                         try:
                             if JOB == True and strDecode[-3:] == 'end' and strDecode[:9] == "this is a":
@@ -504,10 +504,12 @@ while True:
                                         check = check + 1
                                 if (check != 0):
                                     check_Go = True
+                                    keep_First_Home()
                                     print " YOU JA Tum Tor mi ???" + "look : " + STPname
 
                                 else:
                                     keep_First_Home()
+                                    JOB_HowTo_Open = True
 
                             elif check_Go == True and strDecode == "yes let go":
 
@@ -523,13 +525,13 @@ while True:
 
 
 
-                            elif JOB_HowTo_Open == True and strDecode == 'call back step':
+                            elif JOB_HowTo_Open == True and strDecode == 'call back':
                                 print 'Stream decoding result:', strDecode
                                 STPindex += 1
                                 print STPindex, " : ", STPname
                                 talker(9)
                                 # SAVE Action
-                            elif JOB_HowTo_Open == True and strDecode == 'stop call back':
+                            elif JOB_HowTo_Open == True and strDecode == 'stop':
                                 JOB = True
                                 JOB_HowTo_Open = False
                                 STPindex = 0
@@ -538,32 +540,34 @@ while True:
                                 print "STOP.. You ja save mi"
 
                             elif JOB_SAVE == True and strDecode == 'yes':
-                                with sqlite3.connect("Test_PJ2.db") as con:
-                                    cur2 = con.cursor()
-                                    cur2.execute('select ID from ActionName where Name = ?', (STPname,))
-                                    row = cur2.fetchone()
-                                    for element11 in row:
-                                        id1 = int(element11)
-
-                                        cur3 = con.cursor()
-                                        cur3.execute('delete from Action_Robot where ID = ?', (id1,))
-
-                                list1 = []
-                                for i in select_Buffer():
-                                    list1.append(selectID_AcName(STPname))
-                                    for x in i:
-                                        list1.append(x)
+                                while(True):
                                     with sqlite3.connect("Test_PJ2.db") as con:
-                                        cur4 = con.cursor()
-                                        cur4.execute(
-                                            'insert into Action_Robot (ID,StepAction,M1,M2,M3,M4,M5,M6,M7,M8) values (?,?,?,?,?,?,?,?,?,?)',
-                                            (list1))
-                                        print(list1)
-                                        del list1[:]
+                                        cur2 = con.cursor()
+                                        cur2.execute('select ID from ActionName where Name = ?', (STPname,))
+                                        row = cur2.fetchone()
+                                        for element11 in row:
+                                            id1 = int(element11)
 
-                                del_buff()
+                                            cur3 = con.cursor()
+                                            cur3.execute('delete from Action_Robot where ID = ?', (id1,))
 
-                                talker(9)
+                                    list1 = []
+                                    for i in select_Buffer():
+                                        list1.append(selectID_AcName(STPname))
+                                        for x in i:
+                                            list1.append(x)
+                                        with sqlite3.connect("Test_PJ2.db") as con:
+                                            cur4 = con.cursor()
+                                            cur4.execute(
+                                                'insert into Action_Robot (ID,StepAction,M1,M2,M3,M4,M5,M6,M7,M8) values (?,?,?,?,?,?,?,?,?,?)',
+                                                (list1))
+                                            print(list1)
+                                            del list1[:]
+
+                                    del_buff()
+                                    talker(9)
+                                    break
+
                                 JOB_SAVE = False
 
                             elif JOB_SAVE == True and strDecode == 'no':
