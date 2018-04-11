@@ -1,24 +1,3 @@
-# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-"""A set of functions that are used for visualization.
-
-These functions often receive an image, perform some visualization on the image.
-The functions do not return a value, instead they modify the image itself.
-
-"""
 import collections
 import numpy as np
 import PIL.Image as Image
@@ -59,7 +38,6 @@ STANDARD_COLORS = [
 
 def save_image_array_as_png(image, output_path):
   """Saves an image (represented as a numpy array) to PNG.
-
   Args:
     image: a numpy array with shape [height, width, 3].
     output_path: path to which image should be written.
@@ -70,10 +48,8 @@ def save_image_array_as_png(image, output_path):
 
 def encode_image_array_as_png_str(image):
   """Encodes a numpy array into a PNG string.
-
   Args:
     image: a numpy array with shape [height, width, 3].
-
   Returns:
     PNG encoded image string.
   """
@@ -125,7 +101,6 @@ def draw_bounding_box_on_image_array(image,
                                      display_str_list=(),
                                      use_normalized_coordinates=True):
   """Adds a bounding box to an image (numpy array).
-
   Args:
     image: a numpy array with shape [height, width, 3].
     ymin: ymin of bounding box in normalized coordinates (same below).
@@ -157,10 +132,8 @@ def draw_bounding_box_on_image(image,
                                display_str_list=(),
                                use_normalized_coordinates=True):
   """Adds a bounding box to an image.
-
   Each string in display_str_list is displayed on a separate line above the
   bounding box in black text on a rectangle filled with the input 'color'.
-
   Args:
     image: a PIL.Image object.
     ymin: ymin of bounding box.
@@ -213,7 +186,6 @@ def draw_bounding_boxes_on_image_array(image,
                                        thickness=4,
                                        display_str_list_list=()):
   """Draws bounding boxes on image (numpy array).
-
   Args:
     image: a numpy array object.
     boxes: a 2 dimensional numpy array of [N, 4]: (ymin, xmin, ymax, xmax).
@@ -225,7 +197,6 @@ def draw_bounding_boxes_on_image_array(image,
                            The reason to pass a list of strings for a
                            bounding box is that it might contain
                            multiple labels.
-
   Raises:
     ValueError: if boxes is not a [N, 4] array
   """
@@ -242,7 +213,6 @@ def draw_bounding_boxes_on_image(image,
                                  thickness=4,
                                  display_str_list_list=()):
   """Draws bounding boxes on image.
-
   Args:
     image: a PIL.Image object.
     boxes: a 2 dimensional numpy array of [N, 4]: (ymin, xmin, ymax, xmax).
@@ -254,7 +224,6 @@ def draw_bounding_boxes_on_image(image,
                            The reason to pass a list of strings for a
                            bounding box is that it might contain
                            multiple labels.
-
   Raises:
     ValueError: if boxes is not a [N, 4] array
   """
@@ -279,7 +248,6 @@ def draw_keypoints_on_image_array(image,
                                   radius=2,
                                   use_normalized_coordinates=True):
   """Draws keypoints on an image (numpy array).
-
   Args:
     image: a numpy array with shape [height, width, 3].
     keypoints: a numpy array with shape [num_keypoints, 2].
@@ -300,7 +268,6 @@ def draw_keypoints_on_image(image,
                             radius=2,
                             use_normalized_coordinates=True):
   """Draws keypoints on an image.
-
   Args:
     image: a PIL.Image object.
     keypoints: a numpy array with shape [num_keypoints, 2].
@@ -325,14 +292,12 @@ def draw_keypoints_on_image(image,
 
 def draw_mask_on_image_array(image, mask, color='red', alpha=0.7):
   """Draws mask on an image.
-
   Args:
     image: uint8 numpy array with shape (img_height, img_height, 3)
     mask: a float numpy array of shape (img_height, img_height) with
       values between 0 and 1
     color: color to draw the keypoints with. Default is red.
     alpha: transparency value between 0 and 1. (default: 0.7)
-
   Raises:
     ValueError: On incorrect data type for image or masks.
   """
@@ -398,6 +363,12 @@ class Foo():
     def getimage(self):
         return self._img
 
+#set Predic
+    def setPredic(self,s):
+        self._s = s
+    def getPredic(self):
+        return self._s
+
 import time
 start = time.time()
 time.clock()
@@ -410,6 +381,8 @@ import cv2
 
 import numpy as np
 import os
+
+#################################### SVM ########################################################
 
 from sklearn.svm import LinearSVC
 from sklearn.externals import joblib
@@ -434,6 +407,9 @@ def visualize_boxes_and_labels_on_image_array(image,
   box_to_instance_masks_map = {}
   box_to_keypoints_map = collections.defaultdict(list)
 
+
+
+################### CALL  train.pkl ###################################
   clf, classes_names, stdSlr, k, voc = joblib.load("train.pkl")
 
   if not max_boxes_to_draw:
@@ -446,52 +422,61 @@ def visualize_boxes_and_labels_on_image_array(image,
 
       box = tuple(boxes[i].tolist())
 
-      fea_det = cv2.FeatureDetector_create("SIFT")
-      des_ext = cv2.DescriptorExtractor_create("SIFT")
+####################### SIFT #######################################
 
-      des_list = []
-      y = int( box[0] * 479.000)
-      yh = int(box[2] * 479.000)
-      x = int(box[1] * 639.000)
-      xh = int(box[3] * 639.000)
-      print y, " ", yh, " ", x, " ",xh
+      try :
+          fea_det = cv2.FeatureDetector_create("SIFT")
+          des_ext = cv2.DescriptorExtractor_create("SIFT")
 
-      # 143 : 869 // 354 :588
-      # 120:420, 213:456
-      im = image[y:yh, x:xh]
-      kpts = fea_det.detect(im)
-      kpts, des = des_ext.compute(im, kpts)
-      des_list.append((im, des))
-      descriptors = des_list[0][1]
-      for image2, descriptor in des_list[0:]:
-          descriptors = np.vstack((descriptors, descriptor))
+          des_list = []
+          y = int(box[0] * 479.000)
+          yh = int(box[2] * 479.000)
+          x = int(box[1] * 639.000)
+          xh = int(box[3] * 639.000)
+        #  print y, " ", yh, " ", x, " ",xh
 
-      test_features = np.zeros((1, k), "float32")
-      for i in xrange(1):
-          words, distance = vq(des_list[i][1], voc)
-          for w in words:
-              test_features[i][w] += 1
+          im = image[y:yh, x:xh]
+          kpts = fea_det.detect(im)
+          kpts, des = des_ext.compute(im, kpts)
+          des_list.append((im, des))
+          descriptors = des_list[0][1]
+          for image2, descriptor in des_list[0:]:
+              descriptors = np.vstack((descriptors, descriptor))
 
-      test_features = stdSlr.transform(test_features)
+          test_features = np.zeros((1, k), "float32")
+          for i in xrange(1):
+              words, distance = vq(des_list[i][1], voc)
+              for w in words:
+                  test_features[i][w] += 1
 
-      # print clf.predict(test_features) >>>>>> class n. [0] [1]...[n]
-      predictions = [classes_names[i] for i in clf.predict(test_features)]
+          test_features = stdSlr.transform(test_features)
 
-      if instance_masks is not None:
-        box_to_instance_masks_map[box] = instance_masks[i]
-      if keypoints is not None:
-        box_to_keypoints_map[box].extend(keypoints[i])
-      if scores is None:
-        box_to_color_map[box] = 'black'
-      else:
-        if not agnostic_mode:
-          display_str = '{}'.format(str(predictions[0]))
-        box_to_display_str_map[box].append(display_str)
-        if agnostic_mode:
-          box_to_color_map[box] = 'DarkOrange'
-        else:
-          box_to_color_map[box] = STANDARD_COLORS[
-              classes[i] % len(STANDARD_COLORS)]
+          # print clf.predict(test_features) >>>>>> class n. [0] [1]...[n]
+          predictions = [classes_names[i] for i in clf.predict(test_features)]
+          p = str(predictions[0])
+          st = p + "#"+str(y)+","+str(yh)+","+str(x)+","+str(xh)
+          #print p
+          f.setPredic(st)
+
+
+          if instance_masks is not None:
+              box_to_instance_masks_map[box] = instance_masks[i]
+          if keypoints is not None:
+              box_to_keypoints_map[box].extend(keypoints[i])
+          if scores is None:
+              box_to_color_map[box] = 'black'
+          else:
+              if not agnostic_mode:
+                  display_str = '{}'.format(p)  ############# predictions[0] ##################
+              box_to_display_str_map[box].append(display_str)
+              if agnostic_mode:
+                  box_to_color_map[box] = 'DarkOrange'
+              else:
+                  box_to_color_map[box] = STANDARD_COLORS[
+                      classes[i] % len(STANDARD_COLORS)]
+      except :
+          print "..."
+
 
 
   # Draw all boxes onto image.
@@ -530,4 +515,81 @@ def visualize_boxes_and_labels_on_image_array(image,
           radius=line_thickness / 2,
           use_normalized_coordinates=use_normalized_coordinates)
 
+#############  CAPture  ########################
 
+def visualize_boxes_and_labels_on_image_array2(image,
+                                              boxes,
+                                              classes,
+                                              scores,
+                                              category_index,
+                                              instance_masks=None,
+                                              keypoints=None,
+                                              use_normalized_coordinates=False,
+                                              max_boxes_to_draw=20,
+                                              min_score_thresh=.5,
+                                              agnostic_mode=False,
+                                              line_thickness=4):
+  box_to_display_str_map = collections.defaultdict(list)
+  box_to_color_map = collections.defaultdict(str)
+  box_to_instance_masks_map = {}
+  box_to_keypoints_map = collections.defaultdict(list)
+
+
+  if not max_boxes_to_draw:
+    max_boxes_to_draw = boxes.shape[0]
+  for i in range(min(max_boxes_to_draw, boxes.shape[0])):
+      #>>>>>>>>>>>
+    elapsed = time.time() - start
+      #<<<<<<<<<<<<
+    if scores is None or scores[i] > min_score_thresh:
+
+      box = tuple(boxes[i].tolist())
+      if instance_masks is not None:
+          box_to_instance_masks_map[box] = instance_masks[i]
+      if keypoints is not None:
+          box_to_keypoints_map[box].extend(keypoints[i])
+      if scores is None:
+          box_to_color_map[box] = 'black'
+      else:
+          if not agnostic_mode:
+              display_str = '{}'.format("")
+          box_to_display_str_map[box].append(display_str)
+          if agnostic_mode:
+              box_to_color_map[box] = 'DarkOrange'
+          else:
+              box_to_color_map[box] = STANDARD_COLORS[
+                  classes[i] % len(STANDARD_COLORS)]
+
+
+  # Draw all boxes onto image.
+  for box, color in box_to_color_map.items():
+    ymin, xmin, ymax, xmax = box
+    if instance_masks is not None:
+      draw_mask_on_image_array(
+          image,
+          box_to_instance_masks_map[box],
+          color=color
+      )
+    draw_bounding_box_on_image_array(
+        image,
+        ymin,
+        xmin,
+        ymax,
+        xmax,
+        color=color,
+        thickness=line_thickness,
+        display_str_list=box_to_display_str_map[box],
+        use_normalized_coordinates=use_normalized_coordinates)
+    f.setYmin(ymin)
+    f.setYmax(ymax)
+    f.setXmin(xmin)
+    f.setXmax(xmax)
+    f.setimage(image)
+
+    if keypoints is not None:
+      draw_keypoints_on_image_array(
+          image,
+          box_to_keypoints_map[box],
+          color=color,
+          radius=line_thickness / 2,
+          use_normalized_coordinates=use_normalized_coordinates)

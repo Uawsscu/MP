@@ -71,6 +71,16 @@ def talker1(msg1):
     rospy.init_node('Talker', anonymous=True)
 
     pub2.publish(String(msg1))
+
+
+def talker2(msg2):
+    pub3 = rospy.Publisher('walker', String, queue_size=10)
+
+    rospy.init_node('Talker', anonymous=True)
+
+    pub3.publish(String(msg2))
+
+
 ################################################## Keep #####################################################
 
-talker(1)
+talker2("107")
