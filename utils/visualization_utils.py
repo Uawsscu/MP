@@ -363,6 +363,18 @@ class Foo():
     def getimage(self):
         return self._img
 
+    ##
+    def setDetect(self,name):
+        self._name = name
+
+    def getDetect(self):
+        return self._name
+    def setNum(self,num):
+        self._name = num
+
+    def getNum(self):
+        return self._num
+
 #set Predic
     def setPredic(self,s):
         self._s = s

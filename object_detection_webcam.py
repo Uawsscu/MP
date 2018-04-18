@@ -2,7 +2,7 @@ import time
 start = time.time()
 time.clock()
 elapsed = 0
-seconds = 60 # 20 S.
+seconds = 15 # 20 S.
 
 import numpy as np
 import os
@@ -162,7 +162,7 @@ def detectBOW():
 
 def detectBOW2():
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(3)
     vis_util.f.setPredic("")
 
     with detection_graph.as_default():
@@ -186,22 +186,26 @@ def detectBOW2():
                                                              category_index,
                                                              use_normalized_coordinates=True,
                                                              line_thickness=8)
-
-          cv2.imshow('image', cv2.resize(image_np, (640, 480)))
-          st = vis_util.f.getPredic()
-          st = st.split("#")
-          objName = st[0]
-          st2 = st[1].split(",")
-          Xmax = st2[3]
-          Xmin = st2[2]
-          st3 = objName + "," + Xmin + "," + Xmax
-
-
           elapsed = int(time.time() - start)
-
           cv2.imshow('image', cv2.resize(image_np, (640, 480)))
           st = vis_util.f.getPredic()
+          if st != ""  :
+              st = st.split("#")
+              objName = st[0]
+              st2 = st[1].split(",")
+              Xmax = st2[3]
+              Xmin = st2[2]
+              K=  (int(Xmax)+int(Xmin))/2
+              st3 = objName + " " + str(K)
+              print st3
+          if (elapsed >= seconds):
+              #
 
+              cv2.imshow('image', cv2.resize(image_np, (640, 480)))
+              break
+              cv2.destroyAllWindows()#if (elapsed >= seconds):
+            #  return st3
+            #  cv2.destroyAllWindows()
 
           if cv2.waitKey(25) & 0xFF == ord('q'):
               cv2.destroyAllWindows()
