@@ -462,7 +462,7 @@ while True:
                     #print strDecode
 
                     if strDecode != '':
-                        print strDecode
+                        #print strDecode
                         # >>>>>>> END <<<<<<<<<<<<
                         try:
                             if JOB == True and strDecode[-3:] == 'end' and strDecode[:9] == "this is a":
@@ -531,7 +531,7 @@ while True:
                                 print STPindex, " : ", STPname
                                 talker(9)
                                 # SAVE Action
-                            elif JOB_HowTo_Open == True and strDecode == 'stop':
+                            elif JOB_HowTo_Open == True and strDecode == 'stop call back':
                                 JOB = True
                                 JOB_HowTo_Open = False
                                 STPindex = 0
@@ -540,33 +540,38 @@ while True:
                                 print "STOP.. You ja save mi"
 
                             elif JOB_SAVE == True and strDecode == 'yes':
-                                while(True):
+
+
+                                with sqlite3.connect("Test_PJ2.db") as con:
+                                    cur2 = con.cursor()
+                                    cur2.execute('select ID from ActionName where Name = ?', (STPname,))
+                                    row = cur2.fetchone()
+                                    for element11 in row:
+                                        id1 = int(element11)
+
+                                        cur3 = con.cursor()
+                                        cur3.execute('delete from Action_Robot where ID = ?', (id1,))
+
+                                list1 = []
+                                for i in select_Buffer():
+                                    list1.append(selectID_AcName(STPname))
+                                    for x in i:
+                                        list1.append(x)
                                     with sqlite3.connect("Test_PJ2.db") as con:
-                                        cur2 = con.cursor()
-                                        cur2.execute('select ID from ActionName where Name = ?', (STPname,))
-                                        row = cur2.fetchone()
-                                        for element11 in row:
-                                            id1 = int(element11)
+                                        cur4 = con.cursor()
+                                        cur4.execute(
+                                            'insert into Action_Robot (ID,StepAction,M1,M2,M3,M4,M5,M6,M7,M8) values (?,?,?,?,?,?,?,?,?,?)',
+                                            (list1))
+                                        print(list1)
+                                        del list1[:]
 
-                                            cur3 = con.cursor()
-                                            cur3.execute('delete from Action_Robot where ID = ?', (id1,))
+                                del_buff()
 
-                                    list1 = []
-                                    for i in select_Buffer():
-                                        list1.append(selectID_AcName(STPname))
-                                        for x in i:
-                                            list1.append(x)
-                                        with sqlite3.connect("Test_PJ2.db") as con:
-                                            cur4 = con.cursor()
-                                            cur4.execute(
-                                                'insert into Action_Robot (ID,StepAction,M1,M2,M3,M4,M5,M6,M7,M8) values (?,?,?,?,?,?,?,?,?,?)',
-                                                (list1))
-                                            print(list1)
-                                            del list1[:]
 
-                                    del_buff()
-                                    talker(9)
-                                    break
+
+
+
+                                print "SAVE action !"
 
                                 JOB_SAVE = False
 
