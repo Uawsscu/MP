@@ -487,7 +487,7 @@ def visualize_boxes_and_labels_on_image_array(image,
                   box_to_color_map[box] = STANDARD_COLORS[
                       classes[i] % len(STANDARD_COLORS)]
       except :
-          print "..."
+          print "ERROR Visual line490"
 
 
 

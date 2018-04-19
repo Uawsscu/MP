@@ -206,7 +206,11 @@ def detectBOW2():
           if (elapsed >= seconds):
               with sqlite3.connect("Test_PJ2.db") as con:
                   cur=con.cursor()
-                  cur.execute("UPDATE call_Detect SET Name=?,K=? WHERE ID = 1", (objName, K))
+                  try :
+                      cur.execute("UPDATE call_Detect SET Name=?,K=? WHERE ID = 1", (objName, K))
+                  except :
+                      print "ERROR update"
+
               break
               cv2.destroyAllWindows()
 
@@ -223,4 +227,3 @@ print "ss"
 time.sleep(5)
 print "ss"
 detectBOW2()
-time.sleep(5)
