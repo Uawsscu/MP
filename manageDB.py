@@ -91,10 +91,21 @@ remove_Buff_Detect(1)
 """
 #insert_Buff_Detect("ball")
 #print search_Buff_Detect(1)
-#print search_object_Train("ball")
+#print search_object_Train("balljj")
 #lenObj = int(lenDB("Corpus_Main.db", "SELECT * FROM obj_ALL"))
 #print lenObj
 #insert_object_Train("teddy", int(lenObj+1))
 #create_Table("Corpus_Main.db","'''CREATE TABLE obj_ALL(name varchar(50) ,ID INTEGER primary key)'''")
 
-
+def search_callDetect(name):
+    with sqlite3.connect("Test_PJ2.db") as con:
+        cur = con.cursor()
+        try :
+            cur.execute("SELECT " + "K" + " FROM call_Detect where " + "name" + "=?", (name,))
+            rows = cur.fetchone()
+            for element in rows:
+                return element
+        except :
+            return "None"
+center1 = str(search_callDetect("ball"))
+print center1

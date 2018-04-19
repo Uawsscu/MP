@@ -166,7 +166,7 @@ def detectBOW2():
     time.clock()
     elapsed = 0
     seconds = 20  # 20 S.
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(2)
     vis_util.f.setPredic("")
 
     with detection_graph.as_default():
@@ -216,13 +216,11 @@ def detectBOW2():
     cap.release()
     cv2.destroyAllWindows()
 
-detectBOW2()
-print "pass1"
-time.sleep(5)
-detectBOW2()
-print "pass2"
-time.sleep(5)
-detectBOW2()
-print "pass3"
 
-p
+
+detectBOW2()
+print "ss"
+time.sleep(5)
+print "ss"
+detectBOW2()
+time.sleep(5)

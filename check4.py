@@ -103,6 +103,24 @@ def get_objectDetect(text):
                 nounP =word
                 break
     return nounP
+#######################
+
+def get_objectJerry(text):
+    np = False
+    text = text[5:]
+    b = TextBlob(text)
+    nounP=""
+    for item in b.noun_phrases:
+        np = True
+        nounP =item
+
+    if(np==False) :
+        sentence = b.sentences[0]
+        for word, pos in sentence.tags:
+            if pos[0:1] == 'N':
+                nounP =word
+                break
+    return nounP
 
 def get_V(text):
     b = TextBlob(text)
@@ -119,6 +137,6 @@ print get_V("jerry grab a ball")
 #print get_object_question("do you know a red bottle")
 #print get_object_command("jerry grab a ball")
 
-#print get_object_train("This is a teddy bear end")
+#print get_objectJerry("jerry grab a ball")
 #print text2int("test fie is")
 #print get_objectDetect("teddy bear")

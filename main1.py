@@ -407,6 +407,14 @@ def talker1(msg1):
     rospy.init_node('Talker', anonymous=True)
 
     pub2.publish(String(msg1))
+
+def talker2(msg2):
+    pub3 = rospy.Publisher('walker', String, queue_size=10)
+
+    rospy.init_node('Talker', anonymous=True)
+
+    pub3.publish(String(msg2))
+
 ################################################## Keep #####################################################
 
 def keep_First_Home() :
@@ -479,8 +487,12 @@ category_index = label_map_util.create_category_index(categories)
 import cv2
 
 def detectBOW2():
-
-    cap = cv2.VideoCapture(1)
+    import time
+    start = time.time()
+    time.clock()
+    elapsed = 0
+    seconds = 20  # 20 S.
+    cap = cv2.VideoCapture(2)
     vis_util.f.setPredic("")
 
     with detection_graph.as_default():
@@ -693,17 +705,34 @@ while True:
                             elif strDecode[:5] == 'jerry':
                                 print "\n------------------------------------------"
                                 print '\nStream decoding result:', strDecode
-                                obj_name = get_object_train(strDecode)
-                                obj_find = search_object_Train(obj_name) #KNOW
+                                obj_name = get_objectJerry(strDecode)
+                                obj_find = str(search_object_Train(obj_name)) #KNOW
+                                print "obj_find"
+                                v = get_V(strDecode)
+                                print obj_name," ",v
+                                #sert name
+                                check1 = 0
+                                with sqlite3.connect("Test_PJ2.db") as con:
+                                    cur1 = con.cursor()
+                                    cur1.execute(
+                                        'Select ID from ActionName where Name = ?', (v,))
+                                    row1 = cur1.fetchall()
+                                    for i in row1:
+                                        check1 = check1 + 1
 
-                                if obj_find != "None":
-                                    print "ok this is a ",obj_name
-                                    v = get_V(strDecode)  #
+
+                                if obj_find != "None" and check1 != 0:
                                     detectBOW2()
-                                    checkCall = str(search_callDetect(obj_name))
-                                    if(checkCall!= "None") :
-                                        checkCall = int(checkCall)
-                                        if checkCall > 200 and checkCall < 250 :
+                                    time.sleep(5)
+                                    print "ok this is a ",obj_name," and I know ",v
+                                    #
+                                    center1 = str(search_callDetect(obj_name))
+                                    print ">>> call",center1
+
+                                    if(center1!= "None") :
+
+                                        center1 = int(center1)
+                                        if center1 > 200 and center1 < 250 :
                                             with sqlite3.connect("Test_PJ2.db") as con:
                                                 cur = con.cursor()
                                                 cur.execute(
@@ -736,15 +765,11 @@ while True:
                                                     # corpus_Arm
                                         else :
                                             print "Move ROBOT"
+                                            talker2(center1)
                                         #MOVE ROBOT
 
-
-
-
-
-
-                                else:
-                                    print "No , I don't know!"
+                                    elif center1=="None":
+                                        print "No ,I can not see it"
                                         
 
 
