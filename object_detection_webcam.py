@@ -2,7 +2,7 @@ import time
 start = time.time()
 time.clock()
 elapsed = 0
-seconds = 15 # 20 S.
+seconds = 20 # 20 S.
 
 import numpy as np
 import os
@@ -159,10 +159,14 @@ def detectBOW():
           if cv2.waitKey(25) & 0xFF == ord('q'):
               cv2.destroyAllWindows()
               break
-
+import sqlite3
 def detectBOW2():
-
-    cap = cv2.VideoCapture(3)
+    import time
+    start = time.time()
+    time.clock()
+    elapsed = 0
+    seconds = 20  # 20 S.
+    cap = cv2.VideoCapture(1)
     vis_util.f.setPredic("")
 
     with detection_graph.as_default():
@@ -189,6 +193,7 @@ def detectBOW2():
           elapsed = int(time.time() - start)
           cv2.imshow('image', cv2.resize(image_np, (640, 480)))
           st = vis_util.f.getPredic()
+          objName=""
           if st != ""  :
               st = st.split("#")
               objName = st[0]
@@ -199,16 +204,25 @@ def detectBOW2():
               st3 = objName + " " + str(K)
               print st3
           if (elapsed >= seconds):
-              #
-
-              cv2.imshow('image', cv2.resize(image_np, (640, 480)))
+              with sqlite3.connect("Test_PJ2.db") as con:
+                  cur=con.cursor()
+                  cur.execute("UPDATE call_Detect SET Name=?,K=? WHERE ID = 1", (objName, K))
               break
-              cv2.destroyAllWindows()#if (elapsed >= seconds):
-            #  return st3
-            #  cv2.destroyAllWindows()
+              cv2.destroyAllWindows()
 
           if cv2.waitKey(25) & 0xFF == ord('q'):
               cv2.destroyAllWindows()
               break
+    cap.release()
+    cv2.destroyAllWindows()
 
 detectBOW2()
+print "pass1"
+time.sleep(5)
+detectBOW2()
+print "pass2"
+time.sleep(5)
+detectBOW2()
+print "pass3"
+
+p

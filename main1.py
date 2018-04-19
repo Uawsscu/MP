@@ -478,10 +478,9 @@ category_index = label_map_util.create_category_index(categories)
 
 import cv2
 
-
 def detectBOW2():
 
-    cap = cv2.VideoCapture(3)
+    cap = cv2.VideoCapture(1)
     vis_util.f.setPredic("")
 
     with detection_graph.as_default():
@@ -505,9 +504,10 @@ def detectBOW2():
                                                              category_index,
                                                              use_normalized_coordinates=True,
                                                              line_thickness=8)
-
+          elapsed = int(time.time() - start)
           cv2.imshow('image', cv2.resize(image_np, (640, 480)))
           st = vis_util.f.getPredic()
+          objName=""
           if st != ""  :
               st = st.split("#")
               objName = st[0]
@@ -515,19 +515,12 @@ def detectBOW2():
               Xmax = st2[3]
               Xmin = st2[2]
               K=  (int(Xmax)+int(Xmin))/2
-              #st3 = objName + " " + str(K)
-              #print st3
-
-
-          elapsed = int(time.time() - start)
-
-          cv2.imshow('image', cv2.resize(image_np, (640, 480)))
-         #if Not print "I understand"
+              st3 = objName + " " + str(K)
+              print st3
           if (elapsed >= seconds):
-              vis_util.f.setDetect(objName)
-              vis_util.f.setNum(K)
-              print ">> ",vis_util.f.getDetect()
-              print ">> ", vis_util.f.getNum()
+              with sqlite3.connect("Test_PJ2.db") as con:
+                  cur=con.cursor()
+                  cur.execute("UPDATE call_Detect SET Name=?,K=? WHERE ID = 1", (objName, K))
               break
               cv2.destroyAllWindows()
 
@@ -535,7 +528,20 @@ def detectBOW2():
               cv2.destroyAllWindows()
               break
 
+    cap.release()
+    cv2.destroyAllWindows()
 
+########################
+def search_callDetect(name):
+    with sqlite3.connect("Test_PJ2.db") as con:
+        cur = con.cursor()
+        try :
+            cur.execute("SELECT " + "K" + " FROM call_Detect where " + "name" + "=?", (name,))
+            rows = cur.fetchone()
+            for element in rows:
+                return element
+        except :
+            return "None"
 
 ###################
 JOB = True
@@ -687,39 +693,60 @@ while True:
                             elif strDecode[:5] == 'jerry':
                                 print "\n------------------------------------------"
                                 print '\nStream decoding result:', strDecode
-                                v = get_V(strDecode)  #
-                                detectBOW2()
-                                print vis_util.f.getDetect()," ",vis_util.f.getNum()
+                                obj_name = get_object_train(strDecode)
+                                obj_find = search_object_Train(obj_name) #KNOW
 
-                                """with sqlite3.connect("Test_PJ2.db") as con:
-                                    cur = con.cursor()
-                                    cur.execute('select M1,M2,M3,M4,M5,M6,M7,M8 from Action_Robot where ID = 1')
-                                    row1 = cur.fetchall()
-                                    for element1 in row1:
-                                        joint = str(element1)
-                                        command = joint[1:]
-                                        print(command)
-                                        talker1(command)
-                                        time.sleep(3)
+                                if obj_find != "None":
+                                    print "ok this is a ",obj_name
+                                    v = get_V(strDecode)  #
+                                    detectBOW2()
+                                    checkCall = str(search_callDetect(obj_name))
+                                    if(checkCall!= "None") :
+                                        checkCall = int(checkCall)
+                                        if checkCall > 200 and checkCall < 250 :
+                                            with sqlite3.connect("Test_PJ2.db") as con:
+                                                cur = con.cursor()
+                                                cur.execute(
+                                                    'select M1,M2,M3,M4,M5,M6,M7,M8 from Action_Robot where ID = 1')
+                                                row1 = cur.fetchall()
+                                                for element1 in row1:
+                                                    joint = str(element1)
+                                                    command = joint[1:]
+                                                    print(command)
+                                                    talker1(command)
+                                                    time.sleep(3)
 
-                                with sqlite3.connect("Test_PJ2.db") as con:
-                                    cur = con.cursor()
-                                    cur.execute(
-                                        'Select Action_Robot.M1,Action_Robot.M2,Action_Robot.M3,Action_Robot.M4,Action_Robot.M5,Action_Robot.M6,Action_Robot.M7,Action_Robot.M8 from Action_Robot inner join ActionName on Action_Robot.ID = ActionName.ID where Name = ?',
-                                        (v,))
-                                    row = cur.fetchall()
-                                    for element in row:
-                                        joint2 = str(element)
-                                        # command1 = command1 + joint2
-                                        command2 = joint2[1:]
-                                        print(command2)
+                                            with sqlite3.connect("Test_PJ2.db") as con:
+                                                cur = con.cursor()
+                                                cur.execute(
+                                                    'Select Action_Robot.M1,Action_Robot.M2,Action_Robot.M3,Action_Robot.M4,Action_Robot.M5,Action_Robot.M6,Action_Robot.M7,Action_Robot.M8 from Action_Robot inner join ActionName on Action_Robot.ID = ActionName.ID where Name = ?',
+                                                    (v,))
+                                                row = cur.fetchall()
+                                                for element in row:
+                                                    joint2 = str(element)
+                                                    # command1 = command1 + joint2
+                                                    command2 = joint2[1:]
+                                                    print(command2)
 
-                                        talker1(command2)
-                                        # joint = ""
-                                        command1 = ""
+                                                    talker1(command2)
+                                                    # joint = ""
+                                                    command1 = ""
 
-                                        time.sleep(3)
-                                        # corpus_Arm """
+                                                    time.sleep(3)
+                                                    # corpus_Arm
+                                        else :
+                                            print "Move ROBOT"
+                                        #MOVE ROBOT
+
+
+
+
+
+
+                                else:
+                                    print "No , I don't know!"
+                                        
+
 
 
                             # >>>>>>> PASS DO YOU KNOW~??? <<<<<<<<<<<<

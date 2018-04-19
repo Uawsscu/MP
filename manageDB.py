@@ -96,3 +96,5 @@ remove_Buff_Detect(1)
 #print lenObj
 #insert_object_Train("teddy", int(lenObj+1))
 #create_Table("Corpus_Main.db","'''CREATE TABLE obj_ALL(name varchar(50) ,ID INTEGER primary key)'''")
+
+
