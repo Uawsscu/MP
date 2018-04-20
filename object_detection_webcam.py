@@ -120,7 +120,7 @@ def detectBOW():
     start = time.time()
     time.clock()
     elapsed = 0
-    seconds = 20  # 20 S.
+    seconds = 100  # 20 S.
 
     cap = cv2.VideoCapture(1)
     vis_util.f.setPredic("")
@@ -165,8 +165,8 @@ def detectBOW2():
     start = time.time()
     time.clock()
     elapsed = 0
-    seconds = 20  # 20 S.
-    cap = cv2.VideoCapture(2)
+    seconds = 300 # 20 S.
+    cap = cv2.VideoCapture(1)
     vis_util.f.setPredic("")
 
     with detection_graph.as_default():
@@ -222,8 +222,4 @@ def detectBOW2():
 
 
 
-detectBOW2()
-print "ss"
-time.sleep(5)
-print "ss"
 detectBOW2()

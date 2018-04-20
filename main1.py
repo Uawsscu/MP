@@ -493,7 +493,7 @@ def detectBOW2():
     time.clock()
     elapsed = 0
     seconds = 25  # 20 S.
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     vis_util.f.setPredic("")
 
     with detection_graph.as_default():
@@ -583,7 +583,7 @@ while True:
                     #print strDecode
 
                     if strDecode != '':
-                        #print strDecode
+                        print strDecode
                         # >>>>>>> END <<<<<<<<<<<<
                         if JOB == True and strDecode[-3:] == 'end' and strDecode[:9] == "this is a":
                             JOB = False
@@ -764,7 +764,7 @@ while True:
                                         center1 = str(center1)
                                         print center1,"Move ROBOT ",type(center1)
                                         talker2(center1)
-                                        time.sleep(20)
+                                        time.sleep(30)
 
                                         with sqlite3.connect("Test_PJ2.db") as con:
                                             cur = con.cursor()
@@ -776,7 +776,7 @@ while True:
                                                 command = joint[1:]
                                                 print(command)
                                                 talker1(command)
-                                                time.sleep(3)
+                                                time.sleep(4)
 
                                         with sqlite3.connect("Test_PJ2.db") as con:
                                             cur = con.cursor()
@@ -794,7 +794,7 @@ while True:
                                                 # joint = ""
                                                 command1 = ""
 
-                                                time.sleep(3)
+                                                time.sleep(4)
                                                 # corpus_Arm
                                         # MOVE ROBOT
 

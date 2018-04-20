@@ -6,7 +6,7 @@
 
 grammar sentence;
 
-public <move> =   merry one | <b> |go| stop  |  <control> | move to left | [jerry] <command> | <question>  |call [back] | [stop] call [back]|<what>;
+public <move> = jerry grab a ball | [jerry] <command> | merry one | <b> |go| stop  |  <control> | move to left |  <question>  |call [back] | [stop] call [back]|<what>;
 
 <control> = [this is] how to <verb> a <obj> | [this is][how to] <verb> a <color><obj> | yes let go |no |yes;
 

@@ -123,16 +123,17 @@ def get_objectJerry(text):
     return nounP
 
 def get_V(text):
+    vb_NN =''
     b = TextBlob(text)
     for word, pos in b.tags:
-        #print pos
-        if pos[0:2] == 'VB':
+        #print pos," ",word
+        if pos[0:2] == 'VB' or pos[0:2]=='PD':
             vb_NN = word
     if b.words[-2] == "the" and b.words[-3] == "to" :
         vb_NN = vb_NN + " " + b.words[-1]
     return vb_NN
 
-print get_V("jerry grab a ball")
+#print get_V("jerry touch a ball")
 
 #print get_object_question("do you know a red bottle")
 #print get_object_command("jerry grab a ball")
